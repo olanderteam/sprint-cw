@@ -125,6 +125,12 @@ export function createJiraDataRouter(config: ProxyConfig, jiraClient: JiraClient
         stack: config.environment === 'development' ? error.stack : undefined,
       });
 
+      // Check if headers were already sent (timeout already responded)
+      if (res.headersSent) {
+        console.error('[JiraDataRoute] Headers already sent, cannot send error response');
+        return;
+      }
+
       res.header('Access-Control-Allow-Origin', '*');
 
       // Handle specific error types

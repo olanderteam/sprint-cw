@@ -244,6 +244,12 @@ export class JiraClient {
         total = response.data.total;
         startAt += maxResults;
       } catch (error) {
+        // Handle 400 error - board doesn't support sprints (Kanban board)
+        if (axios.isAxiosError(error) && error.response?.status === 400) {
+          console.log(`[JiraClient] Board ${boardId} doesn't support sprints (Kanban board) - skipping`);
+          return []; // Return empty array for Kanban boards
+        }
+        
         this.handleError(error, `getAllSprints(${boardId})`);
         throw error;
       }
