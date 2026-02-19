@@ -444,8 +444,8 @@ async function collectAllSprints(
 
   console.log(`[DataAggregator] Collected ${allSprints.length} unique sprints total`);
 
-  // Cache for 5 minutes (sprints don't change frequently)
-  cache.set(cacheKey, allSprints, 300);
+  // Cache for 30 minutes (longer cache for Vercel to avoid timeout)
+  cache.set(cacheKey, allSprints, 1800);
 
   return allSprints;
 }
@@ -795,6 +795,7 @@ export async function aggregateSquadsData(
   const availableSprints = await collectAllSprints(jiraClient, boardConfigs, cache);
 
   // Collect all unique assignees and issue types from ALL boards (not just active sprint)
+  // Use a more aggressive cache to avoid timeout on Vercel
   console.log('[DataAggregator] Collecting all unique assignees and issue types from all boards');
   const allAssignees = new Set<string>();
   const allIssueTypes = new Set<string>();
@@ -806,8 +807,8 @@ export async function aggregateSquadsData(
   });
 
   // Fetch board history from a few representative boards to get more assignees and types
-  // Limit to first 5 boards to avoid performance issues
-  const boardHistoryPromises = boardConfigs.slice(0, 5).map(async ({ board }) => {
+  // Limit to first 3 boards to avoid timeout on Vercel (10 second limit)
+  const boardHistoryPromises = boardConfigs.slice(0, 3).map(async ({ board }) => {
     try {
       const cacheKey = `board-history-metadata-${board.id}`;
       const cached = cache.get<{ assignees: string[]; types: string[] }>(cacheKey);
@@ -832,8 +833,8 @@ export async function aggregateSquadsData(
         types: Array.from(types),
       };
 
-      // Cache for 10 minutes
-      cache.set(cacheKey, result, 600);
+      // Cache for 30 minutes (longer cache for Vercel)
+      cache.set(cacheKey, result, 1800);
       
       return result;
     } catch (error) {
