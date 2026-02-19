@@ -1,0 +1,58 @@
+========================================
+INSTRUÇÕES PARA RECOMPILAR O SERVIDOR
+========================================
+
+IMPORTANTE: npm install NÃO recompila o código TypeScript!
+
+Você precisa executar o BUILD para compilar as mudanças:
+
+OPÇÃO 1 - Usando o script rebuild.bat:
+--------------------------------------
+1. Abra o terminal na pasta proxy-server
+2. Execute: rebuild.bat
+3. Aguarde a mensagem "Build completed successfully!"
+4. Execute: npm start
+
+OPÇÃO 2 - Usando npm run build:
+--------------------------------------
+1. Abra o terminal na pasta proxy-server
+2. Execute: npm run build
+3. Aguarde a compilação terminar
+4. Execute: npm start
+
+OPÇÃO 3 - Compilação manual:
+--------------------------------------
+1. Abra o terminal na pasta proxy-server
+2. Execute: node node_modules/typescript/lib/tsc.js
+3. Aguarde a compilação terminar
+4. Execute: npm start
+
+========================================
+VERIFICANDO SE FUNCIONOU
+========================================
+
+Após recompilar e iniciar o servidor, você deve ver logs como:
+
+[DataAggregator] Board 123 metrics: {
+  name: 'Squad de Content',
+  totalSP: 45,
+  completedSP: 30,
+  taskDist: { done: 15, inProgress: 8, todo: 5 },
+  issuesCount: 28,
+  blockers: 0,
+  health: 'green'
+}
+
+Se taskDist mostrar valores diferentes de zero, a recompilação funcionou!
+
+========================================
+PASSOS COMPLETOS
+========================================
+
+1. PARE o servidor proxy (Ctrl+C no terminal onde está rodando)
+2. RECOMPILE usando uma das opções acima
+3. INICIE o servidor: npm start
+4. LIMPE o cache do navegador (Ctrl+Shift+R)
+5. RECARREGUE o dashboard
+
+========================================

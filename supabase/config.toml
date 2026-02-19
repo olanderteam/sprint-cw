@@ -1,0 +1,4 @@
+project_id = "phipmibbbbkrwovdazzd"
+
+[functions.jira-data]
+verify_jwt = false

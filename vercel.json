@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "proxy-server/src/index.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/proxy-server/src/index.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ],
+  "env": {
+    "JIRA_DOMAIN": "@jira_domain",
+    "JIRA_EMAIL": "@jira_email",
+    "JIRA_API_TOKEN": "@jira_api_token",
+    "PROJECT_KEYS": "@project_keys"
+  }
+}

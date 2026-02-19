@@ -1,0 +1,170 @@
+import { SquadData, HealthStatus, PersonDistributionItem, TaskItem, Alert } from '@/types/dashboard';
+import { X, TrendingUp, AlertTriangle, Target, Clock, BarChart3 } from 'lucide-react';
+import BurndownSparkline from './BurndownSparkline';
+import DistributionByPerson from '@/components/charts/DistributionByPerson';
+import {
+  LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, Legend,
+} from 'recharts';
+
+interface Props {
+  squad: SquadData;
+  personDistribution: PersonDistributionItem[];
+  tasks: TaskItem[];
+  alerts: Alert[];
+  onClose: () => void;
+}
+
+const healthDot: Record<HealthStatus, string> = {
+  green: 'bg-health-green',
+  yellow: 'bg-health-yellow',
+  red: 'bg-health-red',
+};
+
+const healthLabel: Record<HealthStatus, string> = {
+  green: 'On Track',
+  yellow: 'At Risk',
+  red: 'Critical',
+};
+
+const statusBadge: Record<string, string> = {
+  Done: 'badge-success',
+  'In Progress': 'bg-primary/10 text-primary',
+  'In Review': 'badge-warning',
+  'To Do': 'bg-muted text-muted-foreground',
+};
+
+const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, onClose }: Props) => {
+  const squadTasks = tasks.filter(t => t.squad === squad.name);
+  const squadAlerts = alerts.filter(a => a.squad === squad.name);
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-foreground/20" onClick={onClose} />
+
+      {/* Panel */}
+      <div className="relative z-10 flex h-full w-full max-w-2xl flex-col overflow-y-auto bg-background shadow-xl">
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <span className={`inline-block h-2.5 w-2.5 rounded-full ${healthDot[squad.health]}`} />
+              <span className="text-xs font-medium text-muted-foreground">{healthLabel[squad.health]}</span>
+            </div>
+            <h2 className="text-lg font-semibold text-foreground">{squad.name}</h2>
+          </div>
+          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="flex-1 space-y-6 p-6">
+          {/* KPI Grid */}
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {[
+              { icon: Target, label: 'Completion', value: `${squad.completionPercentage}%`, sub: `${squad.storyPoints.completed}/${squad.storyPoints.total} SP` },
+              { icon: TrendingUp, label: 'Velocity', value: `${squad.velocity} SP`, sub: `Avg ${squad.avgVelocity} SP` },
+              { icon: Clock, label: 'Cycle Time', value: `${squad.cycleTime}d`, sub: 'avg per story' },
+              { icon: BarChart3, label: 'Predictability', value: `${squad.predictability}%`, sub: 'commit vs delivery' },
+            ].map(kpi => (
+              <div key={kpi.label} className="rounded-lg border border-border bg-card p-3">
+                <div className="flex items-center gap-1.5 text-muted-foreground">
+                  <kpi.icon className="h-3.5 w-3.5" />
+                  <span className="text-[10px] font-medium uppercase tracking-wider">{kpi.label}</span>
+                </div>
+                <p className="mt-1 text-xl font-semibold text-foreground">{kpi.value}</p>
+                <p className="text-[10px] text-muted-foreground">{kpi.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Task distribution bar */}
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="mb-2 text-xs font-semibold text-foreground">Task Distribution</p>
+            <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-accent">
+              <div className="bg-health-green transition-all" style={{ width: `${(squad.taskDistribution.done / squad.storyPoints.total) * 100}%` }} />
+              <div className="bg-primary transition-all" style={{ width: `${(squad.taskDistribution.inProgress / squad.storyPoints.total) * 100}%` }} />
+            </div>
+            <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
+              <span>Done {squad.taskDistribution.done} SP</span>
+              <span>In Progress {squad.taskDistribution.inProgress} SP</span>
+              <span>To Do {squad.taskDistribution.todo} SP</span>
+            </div>
+          </div>
+
+          {/* Burndown */}
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="mb-2 text-xs font-semibold text-foreground">Burndown Chart</p>
+            <div className="h-36">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={squad.burndown}>
+                  <CartesianGrid stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="day" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={25} />
+                  <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '6px', fontSize: '11px' }} />
+                  <Legend iconType="circle" iconSize={6} wrapperStyle={{ fontSize: '11px' }} />
+                  <Line type="monotone" dataKey="ideal" stroke="hsl(var(--spark-ideal))" strokeWidth={1} strokeDasharray="4 3" dot={false} name="Ideal" />
+                  <Line type="monotone" dataKey="actual" stroke="hsl(var(--spark-actual))" strokeWidth={2} dot={{ r: 2 }} name="Actual" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Velocity History */}
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="mb-2 text-xs font-semibold text-foreground">Velocity History</p>
+            <div className="h-36">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={squad.velocityHistory}>
+                  <CartesianGrid stroke="hsl(var(--chart-grid))" strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="sprint" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={25} />
+                  <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '6px', fontSize: '11px' }} />
+                  <Line type="monotone" dataKey="points" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--primary))' }} name="SP" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Workload by Person */}
+          {personDistribution.length > 0 && (
+            <DistributionByPerson data={personDistribution} />
+          )}
+
+          {/* Squad Alerts */}
+          {squadAlerts.length > 0 && (
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="mb-2 text-xs font-semibold text-foreground">Blockers & Alerts</p>
+              <div className="space-y-2">
+                {squadAlerts.map(alert => (
+                  <div key={alert.id} className={`flex items-start gap-2 rounded-md px-3 py-2 text-xs ${alert.type === 'critical' ? 'badge-critical' : 'badge-warning'}`}>
+                    <AlertTriangle className="mt-0.5 h-3 w-3 flex-shrink-0" />
+                    <span className="flex-1">{alert.message}</span>
+                    <span className="flex-shrink-0 font-semibold">{alert.storyPointsAffected} SP</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Squad Tasks */}
+          <div className="rounded-lg border border-border bg-card p-4">
+            <p className="mb-3 text-xs font-semibold text-foreground">Tasks ({squadTasks.length})</p>
+            <div className="space-y-1.5">
+              {squadTasks.map(t => (
+                <div key={t.id} className="flex items-center gap-3 rounded-md px-2 py-1.5 text-xs hover:bg-accent/50">
+                  <span className="font-mono font-medium text-primary">{t.key}</span>
+                  <span className="flex-1 truncate text-foreground">{t.summary}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${statusBadge[t.status]}`}>{t.status}</span>
+                  <span className="font-semibold text-foreground">{t.storyPoints} SP</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SquadDetailPanel;

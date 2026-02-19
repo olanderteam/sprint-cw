@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 220 20% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 20% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 12%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 12%;
+
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+
+    --accent: 220 14% 93%;
+    --accent-foreground: 220 20% 12%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217 91% 60%;
+
+    --radius: 0.5rem;
+
+    /* Dashboard-specific tokens */
+    --health-green: 142 71% 45%;
+    --health-yellow: 43 96% 56%;
+    --health-red: 0 72% 51%;
+    --surface-raised: 0 0% 100%;
+    --surface-sunken: 220 20% 97%;
+    --chart-line: 217 91% 60%;
+    --chart-grid: 220 13% 93%;
+    --spark-ideal: 220 9% 80%;
+    --spark-actual: 217 91% 60%;
+    --badge-critical-bg: 0 72% 96%;
+    --badge-critical-fg: 0 72% 45%;
+    --badge-warning-bg: 43 96% 95%;
+    --badge-warning-fg: 43 70% 35%;
+    --badge-success-bg: 142 71% 95%;
+    --badge-success-fg: 142 60% 30%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217 91% 60%;
+  }
+
+  .dark {
+    --background: 220 20% 7%;
+    --foreground: 210 20% 95%;
+
+    --card: 220 20% 10%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 220 20% 10%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 16%;
+    --secondary-foreground: 210 20% 95%;
+
+    --muted: 220 14% 16%;
+    --muted-foreground: 220 9% 60%;
+
+    --accent: 220 14% 18%;
+    --accent-foreground: 210 20% 95%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 14% 18%;
+    --input: 220 14% 18%;
+    --ring: 217 91% 60%;
+    --sidebar-background: 220 20% 7%;
+    --sidebar-foreground: 210 20% 95%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 16%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 220 14% 18%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer utilities {
+  .health-green {
+    color: hsl(var(--health-green));
+  }
+  .health-yellow {
+    color: hsl(var(--health-yellow));
+  }
+  .health-red {
+    color: hsl(var(--health-red));
+  }
+  .bg-health-green {
+    background-color: hsl(var(--health-green));
+  }
+  .bg-health-yellow {
+    background-color: hsl(var(--health-yellow));
+  }
+  .bg-health-red {
+    background-color: hsl(var(--health-red));
+  }
+  .badge-critical {
+    background-color: hsl(var(--badge-critical-bg));
+    color: hsl(var(--badge-critical-fg));
+  }
+  .badge-warning {
+    background-color: hsl(var(--badge-warning-bg));
+    color: hsl(var(--badge-warning-fg));
+  }
+  .badge-success {
+    background-color: hsl(var(--badge-success-bg));
+    color: hsl(var(--badge-success-fg));
+  }
+  .surface-raised {
+    background-color: hsl(var(--surface-raised));
+  }
+  .surface-sunken {
+    background-color: hsl(var(--surface-sunken));
+  }
+}
