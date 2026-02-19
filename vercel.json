@@ -22,11 +22,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "JIRA_DOMAIN": "@jira_domain",
-    "JIRA_EMAIL": "@jira_email",
-    "JIRA_API_TOKEN": "@jira_api_token",
-    "PROJECT_KEYS": "@project_keys"
-  }
+  ]
 }
