@@ -231,6 +231,7 @@ const Index = () => {
           personDistribution={data.personDistribution[selectedSquad.id] ?? []}
           tasks={filteredTasks}
           alerts={data.alerts}
+          availableSprints={data.availableSprints}
           onClose={() => setSelectedSquad(null)}
         />
       )}

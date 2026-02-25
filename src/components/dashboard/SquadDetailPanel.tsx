@@ -1,16 +1,18 @@
-import { SquadData, HealthStatus, PersonDistributionItem, TaskItem, Alert } from '@/types/dashboard';
-import { X, TrendingUp, AlertTriangle, Target, Clock, BarChart3 } from 'lucide-react';
+import { SquadData, HealthStatus, PersonDistributionItem, TaskItem, Alert, SprintInfo } from '@/types/dashboard';
+import { X, TrendingUp, AlertTriangle, Target, Clock, BarChart3, ChevronDown } from 'lucide-react';
 import BurndownSparkline from './BurndownSparkline';
 import DistributionByPerson from '@/components/charts/DistributionByPerson';
 import {
   LineChart, Line, XAxis, YAxis, ResponsiveContainer, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
+import { useState } from 'react';
 
 interface Props {
   squad: SquadData;
   personDistribution: PersonDistributionItem[];
   tasks: TaskItem[];
   alerts: Alert[];
+  availableSprints?: SprintInfo[];
   onClose: () => void;
 }
 
@@ -33,8 +35,11 @@ const statusBadge: Record<string, string> = {
   'To Do': 'bg-muted text-muted-foreground',
 };
 
-const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, onClose }: Props) => {
-  const squadTasks = tasks.filter(t => t.squad === squad.name);
+const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableSprints = [], onClose }: Props) => {
+  const [selectedSprint, setSelectedSprint] = useState<string>(availableSprints[0]?.name || '');
+  const [isSprintDropdownOpen, setIsSprintDropdownOpen] = useState(false);
+
+  const squadTasks = tasks.filter(t => t.squad === squad.name && (!selectedSprint || t.sprint === selectedSprint));
   const squadAlerts = alerts.filter(a => a.squad === squad.name);
 
   return (
@@ -53,9 +58,47 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, onClose }:
             </div>
             <h2 className="text-lg font-semibold text-foreground">{squad.name}</h2>
           </div>
-          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Sprint Selector */}
+            {availableSprints.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsSprintDropdownOpen(!isSprintDropdownOpen)}
+                  className="flex items-center gap-2 rounded-md border border-border bg-card px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
+                >
+                  <span>{selectedSprint || 'Select Sprint'}</span>
+                  <ChevronDown className="h-3.5 w-3.5" />
+                </button>
+                {isSprintDropdownOpen && (
+                  <>
+                    <div
+                      className="fixed inset-0 z-10"
+                      onClick={() => setIsSprintDropdownOpen(false)}
+                    />
+                    <div className="absolute right-0 top-full z-20 mt-1 max-h-60 w-48 overflow-y-auto rounded-md border border-border bg-card shadow-lg">
+                      {availableSprints.map(sprint => (
+                        <button
+                          key={sprint.id}
+                          onClick={() => {
+                            setSelectedSprint(sprint.name);
+                            setIsSprintDropdownOpen(false);
+                          }}
+                          className={`w-full px-3 py-2 text-left text-xs transition-colors hover:bg-accent ${
+                            selectedSprint === sprint.name ? 'bg-accent font-medium' : ''
+                          }`}
+                        >
+                          {sprint.name}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+            <button onClick={onClose} className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <div className="flex-1 space-y-6 p-6">
@@ -63,8 +106,8 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, onClose }:
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { icon: Target, label: 'Completion', value: `${squad.completionPercentage}%`, sub: `${squad.storyPoints.completed}/${squad.storyPoints.total} SP` },
-              { icon: TrendingUp, label: 'Velocity', value: `${squad.velocity} SP`, sub: `Avg ${squad.avgVelocity} SP` },
-              { icon: Clock, label: 'Cycle Time', value: `${squad.cycleTime}d`, sub: 'avg per story' },
+              { icon: TrendingUp, label: 'Velocity', value: `${squad.taskDistribution.inProgress} SP`, sub: 'in progress' },
+              { icon: Clock, label: 'Cycle Time', value: `${squad.storyPoints.completed} SP`, sub: 'completed' },
               { icon: BarChart3, label: 'Predictability', value: `${squad.predictability}%`, sub: 'commit vs delivery' },
             ].map(kpi => (
               <div key={kpi.label} className="rounded-lg border border-border bg-card p-3">
