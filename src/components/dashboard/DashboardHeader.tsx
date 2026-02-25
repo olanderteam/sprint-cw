@@ -18,10 +18,10 @@ const DashboardHeader = ({ sprint, overallPercentage, criticalAlerts, onRefresh 
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Executive Sprint Overview
+            Dashboard de Acompanhamento
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {sprint.name} · {formatDate(sprint.startDate)} – {formatDate(sprint.endDate)}
+            {formatDate(sprint.startDate)} – {formatDate(sprint.endDate)}
           </p>
         </div>
         <button
@@ -29,7 +29,7 @@ const DashboardHeader = ({ sprint, overallPercentage, criticalAlerts, onRefresh 
           className="flex items-center gap-2 rounded-md border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <RefreshCw className="h-3.5 w-3.5" />
-          Refresh
+          Atualizar
         </button>
       </div>
 
