@@ -1,6 +1,6 @@
 import { SquadData, HealthStatus } from '@/types/dashboard';
 import BurndownSparkline from './BurndownSparkline';
-import { AlertTriangle, TrendingUp, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface SquadCardProps {
   squad: SquadData;
@@ -79,21 +79,27 @@ const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
       {/* Bottom stats */}
       <div className="mt-4 grid grid-cols-3 gap-2 border-t border-border pt-3">
         <div>
-          <p className="text-[10px] text-muted-foreground">Velocity</p>
-          <p className="flex items-center gap-1 text-xs font-semibold text-foreground">
-            <TrendingUp className="h-3 w-3 text-primary" />
-            {squad.velocity} SP
+          <p className="text-[10px] text-muted-foreground">Concluídos</p>
+          <p className="flex items-center gap-1 text-xs font-semibold text-health-green">
+            {squad.storyPoints.completed} SP
           </p>
         </div>
         <div>
-          <p className="text-[10px] text-muted-foreground">Cycle Time</p>
-          <p className="text-xs font-semibold text-foreground">{squad.cycleTime}d</p>
+          <p className="text-[10px] text-muted-foreground">Em Progresso</p>
+          <p className="text-xs font-semibold text-primary">
+            {/* Estimate in-progress points based on task distribution */}
+            {Math.round((squad.storyPoints.total - squad.storyPoints.completed) * 
+              (squad.taskDistribution.inProgress / 
+                Math.max(1, squad.taskDistribution.inProgress + squad.taskDistribution.todo)))} SP
+          </p>
         </div>
         <div>
-          <p className="text-[10px] text-muted-foreground">Blockers</p>
-          <p className={`flex items-center gap-1 text-xs font-semibold ${squad.blockers > 0 ? 'text-health-red' : 'text-foreground'}`}>
-            {squad.blockers > 0 && <AlertTriangle className="h-3 w-3" />}
-            {squad.blockers}
+          <p className="text-[10px] text-muted-foreground">Pendentes</p>
+          <p className="text-xs font-semibold text-muted-foreground">
+            {/* Estimate pending points based on task distribution */}
+            {Math.round((squad.storyPoints.total - squad.storyPoints.completed) * 
+              (squad.taskDistribution.todo / 
+                Math.max(1, squad.taskDistribution.inProgress + squad.taskDistribution.todo)))} SP
           </p>
         </div>
       </div>
