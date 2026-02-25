@@ -8,6 +8,10 @@ export interface Board {
   id: number;
   name: string;
   type: 'scrum' | 'kanban';
+  location?: {
+    projectKey?: string;
+    projectName?: string;
+  };
 }
 
 export interface Sprint {
@@ -189,7 +193,7 @@ export class JiraClient {
     // Log all boards found for debugging
     console.log(`[JiraClient] Found ${boards.length} total boards:`);
     boards.forEach(board => {
-      console.log(`  - ID: ${board.id}, Name: "${board.name}", Type: ${board.type}`);
+      console.log(`  - ID: ${board.id}, Name: "${board.name}", Type: ${board.type}, ProjectKey: ${board.location?.projectKey || 'N/A'}`);
     });
 
     return boards;

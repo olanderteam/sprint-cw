@@ -9,7 +9,8 @@ export interface SprintInfo {
   totalStoryPoints: number;
   completedStoryPoints: number;
   goal: string;
-  boardId?: number; // Add board ID reference to link sprints to boards
+  boardId?: number; // Board ID
+  projectKey?: string; // Project key (e.g., "GWT", "CONT", "CHN")
 }
 
 // ... (keep existing interfaces)
@@ -26,7 +27,8 @@ export interface WorkItemAgeItem {
 export interface SquadData {
   id: string;
   name: string;
-  boardId?: number; // Add board ID reference
+  boardId?: number; // Board ID
+  projectKey?: string; // Project key (e.g., "GWT", "CONT", "CHN")
   health: 'green' | 'yellow' | 'red';
   storyPoints: { completed: number; total: number };
   completionPercentage: number;

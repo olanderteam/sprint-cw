@@ -37,7 +37,19 @@ const statusBadge: Record<string, string> = {
 
 const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableSprints = [], onClose }: Props) => {
   // Filter sprints to only show sprints from this squad's board
-  const squadSprints = availableSprints.filter(sprint => sprint.boardId === squad.boardId);
+  // Match by boardId OR projectKey (projectKey is more reliable for matching)
+  const squadSprints = availableSprints.filter(sprint => {
+    // If squad has projectKey, match by projectKey (most reliable)
+    if (squad.projectKey && sprint.projectKey) {
+      return sprint.projectKey === squad.projectKey;
+    }
+    // Fallback to boardId match
+    if (squad.boardId && sprint.boardId) {
+      return sprint.boardId === squad.boardId;
+    }
+    // If no match criteria, don't include
+    return false;
+  });
   
   const [selectedSprint, setSelectedSprint] = useState<string>(squadSprints[0]?.name || '');
   const [isSprintDropdownOpen, setIsSprintDropdownOpen] = useState(false);
