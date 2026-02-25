@@ -15,7 +15,8 @@ export function useJiraData() {
       
       return response.json();
     },
-    staleTime: 2 * 60 * 1000, // 2 min
+    staleTime: 2 * 60 * 1000, // 2 min - dados ficam "velhos" após 2 minutos
+    refetchInterval: 4 * 60 * 1000, // 4 min - refresh automático a cada 4 minutos
     retry: 1,
   });
 }
