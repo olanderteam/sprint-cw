@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    hmr: {
+    hmr: mode === 'production' ? false : {
       overlay: false,
     },
   },
