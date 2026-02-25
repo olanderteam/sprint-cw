@@ -1,137 +1,120 @@
-# Deploy Simples no Vercel (Tudo em Um Lugar)
+# ⚠️ ATENÇÃO: Este Método NÃO Funciona Mais
 
-## ✅ Otimizações Feitas
+## Por que não funciona?
 
-O código foi otimizado para funcionar no Vercel (plano grátis):
-- ✅ Cache mais agressivo (30 minutos)
-- ✅ Processa apenas 3 boards para metadata (ao invés de 5)
-- ✅ Timeout configurado para 60 segundos
+O Vercel tem limite de **10 segundos** para Serverless Functions (plano grátis). Nosso backend precisa buscar dados de múltiplos boards do Jira, o que leva **15-30+ segundos**.
 
-## 🚀 Passo a Passo
+**Resultado:** Erro 500 e timeout constante.
 
-### 1. Acesse o Vercel
+## ✅ Solução: Use Railway + Vercel
 
-1. Vá para: https://vercel.com
-2. Faça login com GitHub
-3. Clique em "Add New Project"
+Siga o guia completo: **`DEPLOY-PROXY-RAILWAY.md`**
 
-### 2. Importe o Repositório
-
-1. Procure por: `olanderteam/sprint-cw`
-2. Clique em "Import"
-
-### 3. Configure o Projeto
-
-O Vercel vai detectar automaticamente que é um projeto Vite. Confirme:
-
-- **Framework Preset:** Vite
-- **Root Directory:** `.` (deixe em branco ou ponto)
-- **Build Command:** `npm run build`
-- **Output Directory:** `dist`
-- **Install Command:** `npm install`
-
-### 4. Adicione as Variáveis de Ambiente
-
-⚠️ **CRÍTICO:** Clique em "Environment Variables" e adicione:
+### Resumo da Arquitetura:
 
 ```
-JIRA_DOMAIN=your-domain.atlassian.net
-JIRA_EMAIL=your-email@example.com
-JIRA_API_TOKEN=your-api-token
+┌─────────────────┐
+│   Frontend      │  ← Vercel (GRÁTIS)
+│   (React/Vite)  │
+└────────┬────────┘
+         │
+         │ VITE_PROXY_URL
+         │
+         ▼
+┌─────────────────┐
+│   Backend       │  ← Railway ($5 crédito grátis/mês)
+│   (Node/Express)│
+└────────┬────────┘
+         │
+         │ JIRA_API_TOKEN
+         │
+         ▼
+┌─────────────────┐
+│   Jira API      │
+└─────────────────┘
 ```
 
-**Como obter o Jira API Token:**
-1. Acesse: https://id.atlassian.com/manage-profile/security/api-tokens
-2. Clique em "Create API token"
-3. Dê um nome: "Sprint Compass"
-4. Copie o token
+## 🚀 Passos Rápidos
 
-**Adicione cada variável:**
-- Name: `JIRA_DOMAIN`
-- Value: `your-domain.atlassian.net` (sem https://)
-- Environments: Marque **Production**, **Preview**, **Development**
+### 1. Deploy Backend no Railway
 
-Repita para `JIRA_EMAIL` e `JIRA_API_TOKEN`.
+Siga: **`DEPLOY-PROXY-RAILWAY.md`** (seção 1-7)
 
-### 5. Deploy!
+Você vai:
+1. Criar conta no Railway
+2. Importar repositório `olanderteam/sprint-cw`
+3. Configurar Root Directory: `proxy-server`
+4. Adicionar variáveis: `JIRA_DOMAIN`, `JIRA_EMAIL`, `JIRA_API_TOKEN`
+5. Obter URL do Railway (ex: `https://seu-app.up.railway.app`)
 
-1. Clique em "Deploy"
-2. Aguarde 2-3 minutos
-3. Acesse a URL fornecida
+### 2. Deploy Frontend no Vercel
 
-## ⚠️ Possíveis Problemas
+1. Acesse: https://vercel.com
+2. Importe: `olanderteom/sprint-cw`
+3. Configure:
+   - Framework: Vite
+   - Root Directory: `.` (raiz)
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
 
-### Problema 1: Timeout (504 Gateway Timeout)
+4. **Adicione APENAS esta variável:**
+   ```
+   VITE_PROXY_URL=https://seu-app.up.railway.app
+   ```
+   (Substitua pela URL do Railway)
 
-Se você tiver **muitos boards** no Jira (mais de 10), pode dar timeout.
+5. Deploy!
 
-**Solução A - Limitar Boards:**
-Adicione mais uma variável de ambiente no Vercel:
+## ❌ NÃO adicione no Vercel:
 
-```
-PROJECT_KEYS=PROJ1,PROJ2,PROJ3
-```
+- ~~JIRA_DOMAIN~~
+- ~~JIRA_EMAIL~~
+- ~~JIRA_API_TOKEN~~
 
-Substitua por suas chaves de projeto do Jira (ex: `SPRINT,DASH,TEAM`).
+Essas variáveis vão no Railway, não no Vercel!
 
-**Solução B - Usar Railway:**
-Se ainda der timeout, siga o guia: `DEPLOY-PROXY-RAILWAY.md`
+## 🐛 Erros Comuns
 
-### Problema 2: Dados não carregam
+### Erro: "Environment Variable JIRA_DOMAIN references Secret jira_domain, which does not exist"
 
-1. Verifique as variáveis de ambiente no Vercel
-2. Vá em "Settings" → "Environment Variables"
-3. Confirme que estão corretas
-4. Faça "Redeploy" (Deployments → três pontos → Redeploy)
+**Causa:** Você adicionou variáveis do Jira no Vercel.
 
-### Problema 3: Filtros não mostram todos os dados
+**Solução:**
+1. Vá em Vercel → Settings → Environment Variables
+2. **DELETE** todas as variáveis do Jira (JIRA_DOMAIN, JIRA_EMAIL, JIRA_API_TOKEN)
+3. Mantenha APENAS: `VITE_PROXY_URL`
+4. Redeploy
 
-Na primeira requisição, pode demorar mais. Aguarde 30-60 segundos.
-Depois, os dados ficam em cache por 30 minutos.
+### Erro: 500 Internal Server Error
 
-## 📊 Monitoramento
+**Causa:** Backend não está rodando ou URL incorreta.
 
-Após o deploy, monitore:
+**Solução:**
+1. Verifique se o Railway está rodando
+2. Teste: `https://seu-app.up.railway.app/api/jira-data`
+3. Deve retornar JSON com dados do Jira
+4. Se não funcionar, verifique logs no Railway
 
-1. **Functions → Logs** no Vercel
-2. Veja se há erros de timeout
-3. Tempo de resposta da API
+### Erro: Failed to fetch
 
-## 🔄 Atualizações
+**Causa:** `VITE_PROXY_URL` incorreta ou não configurada.
 
-Quando você fizer mudanças:
+**Solução:**
+1. Verifique a variável no Vercel
+2. Deve ser: `https://seu-app.up.railway.app` (SEM `/api/jira-data` no final)
+3. Redeploy após corrigir
 
-```bash
-git add .
-git commit -m "Descrição"
-git push origin main
-```
+## 💰 Custos
 
-O Vercel faz deploy automático!
+- **Vercel:** GRÁTIS
+- **Railway:** $5 crédito grátis/mês (suficiente para uso normal)
 
-## ✅ Checklist
+**Total:** $0-5/mês
 
-- [ ] Projeto importado no Vercel
-- [ ] Variáveis de ambiente configuradas (JIRA_DOMAIN, JIRA_EMAIL, JIRA_API_TOKEN)
-- [ ] Deploy realizado
-- [ ] Dashboard acessível
-- [ ] Dados do Jira carregando
-- [ ] Filtros funcionando
+## 📚 Guia Completo
 
-## 🎉 Pronto!
-
-Seu dashboard está no ar!
-
-**URLs:**
-- Dashboard: `https://seu-projeto.vercel.app`
-- Repositório: https://github.com/olanderteam/sprint-cw
-
-## 💡 Dica
-
-Se der timeout frequentemente, considere:
-1. Adicionar `PROJECT_KEYS` para limitar boards
-2. Ou usar Railway para o backend (veja `DEPLOY-PROXY-RAILWAY.md`)
+Para instruções detalhadas, siga: **`DEPLOY-PROXY-RAILWAY.md`**
 
 ---
 
-**Dúvidas?** Verifique os logs no Vercel: Functions → Logs
+**TL;DR:** Não use este guia. Use `DEPLOY-PROXY-RAILWAY.md` para deploy correto.

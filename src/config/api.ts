@@ -3,13 +3,25 @@
  * 
  * Automatically detects the environment and configures the proxy URL accordingly.
  * - Development: Uses localhost:3001 by default
- * - Production (Vercel): Uses relative path /api (Vercel handles routing)
- * - Can be overridden with VITE_PROXY_URL environment variable
+ * - Production: MUST set VITE_PROXY_URL to Railway backend URL
  */
 
+const getProxyUrl = (): string => {
+  // If VITE_PROXY_URL is explicitly set, use it (Railway URL in production)
+  if (import.meta.env.VITE_PROXY_URL) {
+    return import.meta.env.VITE_PROXY_URL;
+  }
+  
+  // Development: use localhost
+  if (import.meta.env.DEV) {
+    return 'http://localhost:3001';
+  }
+  
+  // Production fallback (should not reach here - VITE_PROXY_URL should be set)
+  console.error('VITE_PROXY_URL is not set in production! Please configure it in Vercel.');
+  return '';
+};
+
 export const API_CONFIG = {
-  proxyUrl: import.meta.env.VITE_PROXY_URL || 
-            (import.meta.env.DEV 
-              ? 'http://localhost:3001' 
-              : ''),  // Empty string in production = relative path
+  proxyUrl: getProxyUrl(),
 } as const;

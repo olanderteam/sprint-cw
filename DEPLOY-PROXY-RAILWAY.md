@@ -107,7 +107,7 @@ Agora que o proxy está rodando, vamos configurar o frontend no Vercel:
 
 ### 2. Adicionar Variável de Ambiente no Vercel
 
-⚠️ **CRÍTICO:** Adicione esta variável:
+⚠️ **CRÍTICO:** Adicione APENAS esta variável (NÃO adicione JIRA_DOMAIN, JIRA_EMAIL, JIRA_API_TOKEN no Vercel):
 
 ```
 VITE_PROXY_URL=https://seu-app.up.railway.app
@@ -115,12 +115,18 @@ VITE_PROXY_URL=https://seu-app.up.railway.app
 
 **Substitua** `seu-app.up.railway.app` pela URL que você copiou do Railway!
 
+**IMPORTANTE:** 
+- ✅ A URL deve ser SEM barra no final
+- ✅ Exemplo correto: `https://sprint-proxy.up.railway.app`
+- ❌ Exemplo errado: `https://sprint-proxy.up.railway.app/`
+
 1. No Vercel, vá em "Settings" → "Environment Variables"
 2. Adicione:
    - **Name:** `VITE_PROXY_URL`
-   - **Value:** `https://seu-app.up.railway.app` (sua URL do Railway)
+   - **Value:** `https://seu-app.up.railway.app` (sua URL do Railway, SEM barra no final)
    - **Environment:** Production, Preview, Development (marque todos)
 3. Clique em "Save"
+4. **IMPORTANTE:** Remova qualquer variável `JIRA_DOMAIN`, `JIRA_EMAIL`, ou `JIRA_API_TOKEN` se existirem no Vercel (elas devem estar APENAS no Railway)
 
 ### 3. Fazer Deploy
 

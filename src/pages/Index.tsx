@@ -229,7 +229,7 @@ const Index = () => {
         <SquadDetailPanel
           squad={selectedSquad}
           personDistribution={data.personDistribution[selectedSquad.id] ?? []}
-          tasks={data.tasks}
+          tasks={filteredTasks}
           alerts={data.alerts}
           onClose={() => setSelectedSquad(null)}
         />
