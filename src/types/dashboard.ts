@@ -9,6 +9,7 @@ export interface SprintInfo {
   totalStoryPoints: number;
   completedStoryPoints: number;
   goal: string;
+  boardId?: number; // Add board ID reference to link sprints to boards
 }
 
 // ... (keep existing interfaces)
@@ -23,7 +24,33 @@ export interface WorkItemAgeItem {
 }
 
 export interface SquadData {
+  id: string;
+  name: string;
+  boardId?: number; // Add board ID reference
+  health: 'green' | 'yellow' | 'red';
+  storyPoints: { completed: number; total: number };
+  completionPercentage: number;
+  velocity: number;
+  avgVelocity: number;
+  burndown: BurndownPoint[];
+  taskDistribution: { done: number; inProgress: number; todo: number };
+  blockers: number;
+  predictability: number;
+  velocityHistory: VelocityHistoryItem[];
+  capacity: number;
+  cycleTime: number;
   goal?: string;
+}
+
+export interface BurndownPoint {
+  day: number;
+  ideal: number;
+  actual: number;
+}
+
+export interface VelocityHistoryItem {
+  sprint: string;
+  points: number;
 }
 
 export interface DashboardData {

@@ -36,7 +36,10 @@ const statusBadge: Record<string, string> = {
 };
 
 const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableSprints = [], onClose }: Props) => {
-  const [selectedSprint, setSelectedSprint] = useState<string>(availableSprints[0]?.name || '');
+  // Filter sprints to only show sprints from this squad's board
+  const squadSprints = availableSprints.filter(sprint => sprint.boardId === squad.boardId);
+  
+  const [selectedSprint, setSelectedSprint] = useState<string>(squadSprints[0]?.name || '');
   const [isSprintDropdownOpen, setIsSprintDropdownOpen] = useState(false);
 
   const squadTasks = tasks.filter(t => t.squad === squad.name && (!selectedSprint || t.sprint === selectedSprint));
@@ -60,7 +63,7 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
           </div>
           <div className="flex items-center gap-3">
             {/* Sprint Selector */}
-            {availableSprints.length > 0 && (
+            {squadSprints.length > 0 && (
               <div className="relative">
                 <button
                   onClick={() => setIsSprintDropdownOpen(!isSprintDropdownOpen)}
@@ -76,7 +79,7 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
                       onClick={() => setIsSprintDropdownOpen(false)}
                     />
                     <div className="absolute right-0 top-full z-20 mt-1 max-h-60 w-48 overflow-y-auto rounded-md border border-border bg-card shadow-lg">
-                      {availableSprints.map(sprint => (
+                      {squadSprints.map(sprint => (
                         <button
                           key={sprint.id}
                           onClick={() => {

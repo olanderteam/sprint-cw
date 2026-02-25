@@ -18,11 +18,13 @@ export interface SprintInfo {
   totalStoryPoints: number;
   completedStoryPoints: number;
   goal: string;
+  boardId?: number; // Add board ID reference to link sprints to boards
 }
 
 export interface SquadData {
   id: string;
   name: string;
+  boardId: number; // Add board ID reference
   health: 'green' | 'yellow' | 'red';
   storyPoints: { completed: number; total: number };
   completionPercentage: number;
@@ -409,7 +411,8 @@ async function collectAllSprints(
     try {
       const sprints = await jiraClient.getAllSprints(board.id);
       console.log(`[DataAggregator] Board ${board.id} (${board.name}): Found ${sprints.length} sprints`);
-      return sprints;
+      // Add boardId to each sprint
+      return sprints.map(sprint => ({ ...sprint, boardId: board.id }));
     } catch (error) {
       console.error(`[DataAggregator] Failed to fetch sprints for board ${board.id}:`, error);
       return [];
@@ -431,6 +434,7 @@ async function collectAllSprints(
         totalStoryPoints: 0,
         completedStoryPoints: 0,
         goal: sprint.goal || '',
+        boardId: sprint.boardId, // Include board ID
       });
     }
   });
@@ -701,6 +705,7 @@ export async function aggregateSquadsData(
       const squadData: SquadData = {
         id: squadId,
         name: formatSquadName(board.name),
+        boardId: board.id, // Add board ID
         health,
         storyPoints: { completed: squadCompletedSP, total: squadTotalSP },
         completionPercentage: completionPct,
