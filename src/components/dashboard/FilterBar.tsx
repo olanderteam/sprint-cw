@@ -6,9 +6,9 @@ interface FilterBarProps {
 }
 
 const filters: { value: FilterOption; label: string }[] = [
-  { value: 'all', label: 'All Squads' },
-  { value: 'at-risk', label: 'At Risk' },
-  { value: 'critical', label: 'Critical' },
+  { value: 'all', label: 'Todos os Squads' },
+  { value: 'at-risk', label: 'Em Risco' },
+  { value: 'critical', label: 'Crítico' },
 ];
 
 const FilterBar = ({ activeFilter, onFilterChange }: FilterBarProps) => {

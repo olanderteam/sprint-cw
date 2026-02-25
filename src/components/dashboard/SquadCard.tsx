@@ -14,9 +14,9 @@ const healthDot: Record<HealthStatus, string> = {
 };
 
 const healthLabel: Record<HealthStatus, string> = {
-  green: 'On Track',
-  yellow: 'At Risk',
-  red: 'Critical',
+  green: 'No Prazo',
+  yellow: 'Em Risco',
+  red: 'Crítico',
 };
 
 const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
@@ -109,7 +109,7 @@ const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
         onClick={() => onViewDetails(squad)}
         className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-md border border-border py-1.5 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
       >
-        View Details <ArrowRight className="h-3 w-3" />
+        Ver Detalhes <ArrowRight className="h-3 w-3" />
       </button>
     </div>
   );

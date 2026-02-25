@@ -36,7 +36,7 @@ const VelocityChart = ({ squads }: VelocityChartProps) => {
 
   return (
     <div className="rounded-lg border border-border bg-card p-5">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">Velocity Comparison</h3>
+      <h3 className="mb-4 text-sm font-semibold text-foreground">Comparação de Velocity</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>

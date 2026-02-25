@@ -10,7 +10,7 @@ const AlertsPanel = ({ alerts }: AlertsPanelProps) => {
 
   return (
     <div className="rounded-lg border border-border bg-card p-5">
-      <h3 className="mb-4 text-sm font-semibold text-foreground">Alerts & Blockers</h3>
+      <h3 className="mb-4 text-sm font-semibold text-foreground">Alertas & Blockers</h3>
       <div className="space-y-3">
         {alerts.map(alert => (
           <div

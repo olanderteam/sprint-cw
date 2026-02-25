@@ -44,7 +44,7 @@ const DashboardHeader = ({ sprint, overallPercentage, criticalAlerts, onRefresh 
         {criticalAlerts > 0 && (
           <div className="badge-critical flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
             <span className="inline-block h-1.5 w-1.5 animate-pulse-subtle rounded-full bg-health-red" />
-            {criticalAlerts} Critical Alert{criticalAlerts > 1 ? 's' : ''}
+            {criticalAlerts} Alerta{criticalAlerts > 1 ? 's' : ''} Crítico{criticalAlerts > 1 ? 's' : ''}
           </div>
         )}
       </div>

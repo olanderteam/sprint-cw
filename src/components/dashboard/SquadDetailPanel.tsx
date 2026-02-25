@@ -23,9 +23,9 @@ const healthDot: Record<HealthStatus, string> = {
 };
 
 const healthLabel: Record<HealthStatus, string> = {
-  green: 'On Track',
-  yellow: 'At Risk',
-  red: 'Critical',
+  green: 'No Prazo',
+  yellow: 'Em Risco',
+  red: 'Crítico',
 };
 
 const statusBadge: Record<string, string> = {
@@ -121,9 +121,9 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
               { icon: Target, label: 'Completion', value: `${squad.completionPercentage}%`, sub: `${squad.storyPoints.completed}/${squad.storyPoints.total} SP` },
-              { icon: TrendingUp, label: 'Velocity', value: `${squad.taskDistribution.inProgress} SP`, sub: 'in progress' },
-              { icon: Clock, label: 'Cycle Time', value: `${squad.storyPoints.completed} SP`, sub: 'completed' },
-              { icon: BarChart3, label: 'Predictability', value: `${squad.predictability}%`, sub: 'commit vs delivery' },
+              { icon: TrendingUp, label: 'Velocity', value: `${squad.taskDistribution.inProgress} SP`, sub: 'em progresso' },
+              { icon: Clock, label: 'Cycle Time', value: `${squad.storyPoints.completed} SP`, sub: 'concluídos' },
+              { icon: BarChart3, label: 'Predictability', value: `${squad.predictability}%`, sub: 'commit vs entrega' },
             ].map(kpi => (
               <div key={kpi.label} className="rounded-lg border border-border bg-card p-3">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -138,21 +138,21 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
 
           {/* Task distribution bar */}
           <div className="rounded-lg border border-border bg-card p-4">
-            <p className="mb-2 text-xs font-semibold text-foreground">Task Distribution</p>
+            <p className="mb-2 text-xs font-semibold text-foreground">Distribuição de Tasks</p>
             <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-accent">
               <div className="bg-health-green transition-all" style={{ width: `${(squad.taskDistribution.done / squad.storyPoints.total) * 100}%` }} />
               <div className="bg-primary transition-all" style={{ width: `${(squad.taskDistribution.inProgress / squad.storyPoints.total) * 100}%` }} />
             </div>
             <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
-              <span>Done {squad.taskDistribution.done} SP</span>
-              <span>In Progress {squad.taskDistribution.inProgress} SP</span>
-              <span>To Do {squad.taskDistribution.todo} SP</span>
+              <span>Concluído {squad.taskDistribution.done} SP</span>
+              <span>Em Progresso {squad.taskDistribution.inProgress} SP</span>
+              <span>Pendente {squad.taskDistribution.todo} SP</span>
             </div>
           </div>
 
           {/* Burndown */}
           <div className="rounded-lg border border-border bg-card p-4">
-            <p className="mb-2 text-xs font-semibold text-foreground">Burndown Chart</p>
+            <p className="mb-2 text-xs font-semibold text-foreground">Gráfico de Burndown</p>
             <div className="h-36">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={squad.burndown}>
@@ -162,7 +162,7 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
                   <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '6px', fontSize: '11px' }} />
                   <Legend iconType="circle" iconSize={6} wrapperStyle={{ fontSize: '11px' }} />
                   <Line type="monotone" dataKey="ideal" stroke="hsl(var(--spark-ideal))" strokeWidth={1} strokeDasharray="4 3" dot={false} name="Ideal" />
-                  <Line type="monotone" dataKey="actual" stroke="hsl(var(--spark-actual))" strokeWidth={2} dot={{ r: 2 }} name="Actual" />
+                  <Line type="monotone" dataKey="actual" stroke="hsl(var(--spark-actual))" strokeWidth={2} dot={{ r: 2 }} name="Real" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -170,7 +170,7 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
 
           {/* Velocity History */}
           <div className="rounded-lg border border-border bg-card p-4">
-            <p className="mb-2 text-xs font-semibold text-foreground">Velocity History</p>
+            <p className="mb-2 text-xs font-semibold text-foreground">Histórico de Velocity</p>
             <div className="h-36">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={squad.velocityHistory}>
@@ -192,7 +192,7 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
           {/* Squad Alerts */}
           {squadAlerts.length > 0 && (
             <div className="rounded-lg border border-border bg-card p-4">
-              <p className="mb-2 text-xs font-semibold text-foreground">Blockers & Alerts</p>
+              <p className="mb-2 text-xs font-semibold text-foreground">Blockers & Alertas</p>
               <div className="space-y-2">
                 {squadAlerts.map(alert => (
                   <div key={alert.id} className={`flex items-start gap-2 rounded-md px-3 py-2 text-xs ${alert.type === 'critical' ? 'badge-critical' : 'badge-warning'}`}>
