@@ -183,7 +183,7 @@ const Index = () => {
         {/* Squad Grid */}
         <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSquads.map(squad => (
-            <SquadCard key={squad.id} squad={squad} onViewDetails={setSelectedSquad} />
+            <SquadCard key={squad.id} squad={squad} filteredTasks={filteredTasks} onViewDetails={setSelectedSquad} />
           ))}
         </div>
 

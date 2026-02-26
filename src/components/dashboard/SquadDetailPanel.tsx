@@ -57,6 +57,15 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
   const squadTasks = tasks.filter(t => t.squad === squad.name && (!selectedSprint || t.sprint === selectedSprint));
   const squadAlerts = alerts.filter(a => a.squad === squad.name);
 
+  // Debug: Log para verificar o filtro
+  console.log('[SquadDetailPanel] Debug:', {
+    squadName: squad.name,
+    selectedSprint,
+    totalTasks: tasks.filter(t => t.squad === squad.name).length,
+    filteredTasks: squadTasks.length,
+    sampleTask: squadTasks[0],
+  });
+
   // Calculate task distribution based on filtered tasks
   const filteredDistribution = squadTasks.reduce((acc, task) => {
     const sp = task.storyPoints || 0;
@@ -72,6 +81,12 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
 
   const totalFilteredSP = filteredDistribution.done + filteredDistribution.inProgress + filteredDistribution.todo;
   const filteredCompletionPercentage = totalFilteredSP > 0 ? Math.round((filteredDistribution.done / totalFilteredSP) * 100) : 0;
+
+  console.log('[SquadDetailPanel] Calculated distribution:', {
+    filteredDistribution,
+    totalFilteredSP,
+    filteredCompletionPercentage,
+  });
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">

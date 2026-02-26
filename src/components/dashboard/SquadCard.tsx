@@ -1,9 +1,10 @@
-import { SquadData, HealthStatus } from '@/types/dashboard';
+import { SquadData, HealthStatus, TaskItem } from '@/types/dashboard';
 import BurndownSparkline from './BurndownSparkline';
 import { ArrowRight } from 'lucide-react';
 
 interface SquadCardProps {
   squad: SquadData;
+  filteredTasks: TaskItem[];
   onViewDetails: (squad: SquadData) => void;
 }
 
@@ -19,14 +20,29 @@ const healthLabel: Record<HealthStatus, string> = {
   red: 'Crítico',
 };
 
-const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
-  // Use task distribution total if story points total is 0
-  const barTotal = squad.storyPoints.total > 0 
-    ? squad.storyPoints.total 
-    : (squad.taskDistribution.done + squad.taskDistribution.inProgress + squad.taskDistribution.todo);
+const SquadCard = ({ squad, filteredTasks, onViewDetails }: SquadCardProps) => {
+  // Calculate metrics based on filtered tasks for this squad
+  const squadFilteredTasks = filteredTasks.filter(t => t.squad === squad.name);
   
-  const doneW = barTotal > 0 ? (squad.taskDistribution.done / barTotal) * 100 : 0;
-  const inProgressW = barTotal > 0 ? (squad.taskDistribution.inProgress / barTotal) * 100 : 0;
+  const calculatedDistribution = squadFilteredTasks.reduce((acc, task) => {
+    const sp = task.storyPoints || 0;
+    if (task.status === 'Done') {
+      acc.done += sp;
+    } else if (task.status === 'In Progress' || task.status === 'In Review') {
+      acc.inProgress += sp;
+    } else {
+      acc.todo += sp;
+    }
+    return acc;
+  }, { done: 0, inProgress: 0, todo: 0 });
+
+  const totalSP = calculatedDistribution.done + calculatedDistribution.inProgress + calculatedDistribution.todo;
+  const completionPercentage = totalSP > 0 ? Math.round((calculatedDistribution.done / totalSP) * 100) : 0;
+
+  // Use calculated distribution for the bar
+  const barTotal = totalSP > 0 ? totalSP : 1;
+  const doneW = (calculatedDistribution.done / barTotal) * 100;
+  const inProgressW = (calculatedDistribution.inProgress / barTotal) * 100;
 
   return (
     <div className="group rounded-lg border border-border bg-card p-5 transition-shadow hover:shadow-md">
@@ -42,10 +58,10 @@ const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
       {/* Big number */}
       <div className="mt-3 flex items-baseline gap-2">
         <span className="text-2xl font-semibold tracking-tight text-foreground">
-          {squad.completionPercentage}%
+          {completionPercentage}%
         </span>
         <span className="text-xs text-muted-foreground">
-          {squad.storyPoints.completed}/{squad.storyPoints.total} SP
+          {calculatedDistribution.done}/{totalSP} SP
         </span>
       </div>
 
@@ -57,9 +73,9 @@ const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
         {doneW === 0 && inProgressW === 0 && <div className="bg-muted w-full" />}
       </div>
       <div className="mt-1.5 flex justify-between text-[10px] text-muted-foreground">
-        <span>Done {squad.taskDistribution.done}</span>
-        <span>In Progress {squad.taskDistribution.inProgress}</span>
-        <span>To Do {squad.taskDistribution.todo}</span>
+        <span>Done {calculatedDistribution.done}</span>
+        <span>In Progress {calculatedDistribution.inProgress}</span>
+        <span>To Do {calculatedDistribution.todo}</span>
       </div>
 
       {/* Goal */}
@@ -81,25 +97,19 @@ const SquadCard = ({ squad, onViewDetails }: SquadCardProps) => {
         <div>
           <p className="text-[10px] text-muted-foreground">Concluídos</p>
           <p className="flex items-center gap-1 text-xs font-semibold text-health-green">
-            {squad.storyPoints.completed} SP
+            {calculatedDistribution.done} SP
           </p>
         </div>
         <div>
           <p className="text-[10px] text-muted-foreground">Em Progresso</p>
           <p className="text-xs font-semibold text-primary">
-            {/* Estimate in-progress points based on task distribution */}
-            {Math.round((squad.storyPoints.total - squad.storyPoints.completed) * 
-              (squad.taskDistribution.inProgress / 
-                Math.max(1, squad.taskDistribution.inProgress + squad.taskDistribution.todo)))} SP
+            {calculatedDistribution.inProgress} SP
           </p>
         </div>
         <div>
           <p className="text-[10px] text-muted-foreground">Pendentes</p>
           <p className="text-xs font-semibold text-muted-foreground">
-            {/* Estimate pending points based on task distribution */}
-            {Math.round((squad.storyPoints.total - squad.storyPoints.completed) * 
-              (squad.taskDistribution.todo / 
-                Math.max(1, squad.taskDistribution.inProgress + squad.taskDistribution.todo)))} SP
+            {calculatedDistribution.todo} SP
           </p>
         </div>
       </div>
