@@ -57,6 +57,22 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
   const squadTasks = tasks.filter(t => t.squad === squad.name && (!selectedSprint || t.sprint === selectedSprint));
   const squadAlerts = alerts.filter(a => a.squad === squad.name);
 
+  // Calculate task distribution based on filtered tasks
+  const filteredDistribution = squadTasks.reduce((acc, task) => {
+    const sp = task.storyPoints || 0;
+    if (task.status === 'Done') {
+      acc.done += sp;
+    } else if (task.status === 'In Progress' || task.status === 'In Review') {
+      acc.inProgress += sp;
+    } else {
+      acc.todo += sp;
+    }
+    return acc;
+  }, { done: 0, inProgress: 0, todo: 0 });
+
+  const totalFilteredSP = filteredDistribution.done + filteredDistribution.inProgress + filteredDistribution.todo;
+  const filteredCompletionPercentage = totalFilteredSP > 0 ? Math.round((filteredDistribution.done / totalFilteredSP) * 100) : 0;
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Overlay */}
@@ -120,9 +136,9 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
           {/* KPI Grid */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {[
-              { icon: Target, label: 'Completion', value: `${squad.completionPercentage}%`, sub: `${squad.storyPoints.completed}/${squad.storyPoints.total} SP` },
-              { icon: TrendingUp, label: 'Velocity', value: `${squad.taskDistribution.inProgress} SP`, sub: 'em progresso' },
-              { icon: Clock, label: 'Cycle Time', value: `${squad.storyPoints.completed} SP`, sub: 'concluídos' },
+              { icon: Target, label: 'Completion', value: `${filteredCompletionPercentage}%`, sub: `${filteredDistribution.done}/${totalFilteredSP} SP` },
+              { icon: TrendingUp, label: 'Velocity', value: `${filteredDistribution.inProgress} SP`, sub: 'em progresso' },
+              { icon: Clock, label: 'Cycle Time', value: `${filteredDistribution.done} SP`, sub: 'concluídos' },
               { icon: BarChart3, label: 'Predictability', value: `${squad.predictability}%`, sub: 'commit vs entrega' },
             ].map(kpi => (
               <div key={kpi.label} className="rounded-lg border border-border bg-card p-3">
@@ -140,13 +156,13 @@ const SquadDetailPanel = ({ squad, personDistribution, tasks, alerts, availableS
           <div className="rounded-lg border border-border bg-card p-4">
             <p className="mb-2 text-xs font-semibold text-foreground">Distribuição de Tasks</p>
             <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-accent">
-              <div className="bg-health-green transition-all" style={{ width: `${(squad.taskDistribution.done / squad.storyPoints.total) * 100}%` }} />
-              <div className="bg-primary transition-all" style={{ width: `${(squad.taskDistribution.inProgress / squad.storyPoints.total) * 100}%` }} />
+              <div className="bg-health-green transition-all" style={{ width: `${totalFilteredSP > 0 ? (filteredDistribution.done / totalFilteredSP) * 100 : 0}%` }} />
+              <div className="bg-primary transition-all" style={{ width: `${totalFilteredSP > 0 ? (filteredDistribution.inProgress / totalFilteredSP) * 100 : 0}%` }} />
             </div>
             <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">
-              <span>Concluído {squad.taskDistribution.done} SP</span>
-              <span>Em Progresso {squad.taskDistribution.inProgress} SP</span>
-              <span>Pendente {squad.taskDistribution.todo} SP</span>
+              <span>Concluído {filteredDistribution.done} SP</span>
+              <span>Em Progresso {filteredDistribution.inProgress} SP</span>
+              <span>Pendente {filteredDistribution.todo} SP</span>
             </div>
           </div>
 
